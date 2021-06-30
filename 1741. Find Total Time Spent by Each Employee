@@ -46,11 +46,12 @@ Employee 2 has two events: one on day 2020-11-28 with a total of (33 - 3) = 30, 
 
 来源：力扣（LeetCode）
 链接：https://leetcode-cn.com/problems/find-total-time-spent-by-each-employee
+#典型题，一张表内计算加减
 
 # Write your MySQL query statement below
 select event_day as day, 
        emp_id, 
-       sum(out_time)-sum(in_time) as total_time
+       sum(out_time_in_time) as total_time   #OR: sum(out_time)-sum(in_time) as total_time
 from employees
 group by event_day,emp_id  #看用哪一個來排序：event_day & employee_id 選同一個人 同一天的
 
