@@ -1,0 +1,42 @@
+# Leetcode
+
+Given a table customer holding customers information and the referee.
+
++------+------+-----------+
+| id   | name | referee_id|
++------+------+-----------+
+|    1 | Will |      NULL |
+|    2 | Jane |      NULL |
+|    3 | Alex |         2 |
+|    4 | Bill |      NULL |
+|    5 | Zack |         1 |
+|    6 | Mark |         2 |
++------+------+-----------+
+Write a query to return the list of customers NOT referred by the person with id '2'.
+
+For the sample data above, the result is:
+
++------+
+| name |
++------+
+| Will |
+| Jane |
+| Bill |
+| Zack |
++------+
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/find-customer-referee
+
+
+### NOTE ###
+-- 用 OR 因為無法兩個同時發生 null & 2
+--  is null ; is not null
+-- 不等於 <> 或是 =!
+
+
+# Write your MySQL query statement below
+select name from customer
+# where referee_id is NULL AND referee_id <> 2   
+WHERE referee_id != 2 OR referee_id IS NULL;
+
