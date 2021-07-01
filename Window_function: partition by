@@ -36,4 +36,7 @@ STEPS:
   on c.id = o.cust_id  
   order by first_name  
   
+
+source: https://www.youtube.com/watch?v=EPUayNC5ku4
+  
   
