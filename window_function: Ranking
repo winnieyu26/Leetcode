@@ -21,3 +21,6 @@ ROW_NUMBER = unique incrementing int
 RANK = same rank for same value
 DENSE_RANK = same rank for same value
 NTULE(數字) = assign tile numbers based on number of tile requested
+
+
+YT Tutorial for other window function: https://www.youtube.com/watch?v=H6OTMoXjNiM
