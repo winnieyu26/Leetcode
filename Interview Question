@@ -1,0 +1,41 @@
+Write a query: 
+1. Return emp record with highest salary
+2. Return the highest salary in emp table
+3. Return 2nd highest salary in emp table
+4. Select range of emp based on ID
+5. Return an employee with the highest salary and the emp's department name 
+6. Return highest salary, emp_name, department_name for each department 
+
+
+ANS:
+1. select * from emp
+   where salary = (select max(salary) from emp) ------ 當 salary = max salary
+
+2. select Max(salary) from emp
+
+3. select Max(salary) from emp  ----select max salary
+   where salary NOT IN (select Max(salary) from emp  ------NOT IN = not equal 選不是最高的
+   
+4. select * from emp
+   where emp_id betwenn 2003 and 2008 ------ range 用 between A and B
+   
+5. select first_name, last_name, salary, department_name ------ 1) department_name 不是在 emp table, 但emp裡有"department_id"
+   from Employee e INNER JOIN Department                 ----- 2) department_name 在 department table, 但emp裡有"department_id"
+  
+   3) 把兩個table 取名 e, d ----- 記得前面select 也要加個 e.first_name (Table名.column)
+   select e.first_name, e.last_name, e.salary, d.department_name
+   from Emp e INNER JOIN Department d ON (e.department_id = d.department_id)   ------- 4) “JOIN” new table “ON” （___ = ___） 兩個table 共同點
+   ---- 到這邊可以先跑看長怎樣 ---- 5) 我們得到所有的salary 但我們只取 highest salary ---> 最高值想到MAX 
+   where salary IN (select Max(salary) from empployee
+   
+6. seleect e.first_name, e.last_name, e.salary, d.department_name
+   from emp e INNER JOIN Department d ON e.department_id = d.department_id)
+   where salary IN (select Max(salary) from employee group by department_id)  ---- for each department: 用 group by
+   
+   
+   
+   
+   
+   
+
+
