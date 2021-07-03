@@ -1,0 +1,45 @@
+# Inner Join
+Select Table1.Column1, Table1.Column2, Table2.Column1, Table2.Column2,....
+From Table1
+INNER JOIN Table2 
+on Table1.MatchingColumnName = Table2.MatchingColumnName 
+
+# INNER JOIN: Returns record mathcing in both tables
+Table 1: 
+aaa bbb
+
+Table 2: 
+aaa ccc
+
+INNER JOIN -->  1.aaa  1.bbb  2.aaa   2.ccc  
+
+# LEFT Join
+Select Table1.Column1, Table1.Column2, Table2.Column1, Table2.Column2,....
+From Table1
+LEFT JOIN Table2 
+on Table1.MatchingColumnName = Table2.MatchingColumnName 
+
+# Left JOIN: Returns all record from left table, also those mathcing in right tables. 
+-- No mathcing: returns NULL values (no matching in right 右邊沒match）
+
+
+# RIGHT Join
+Select Table1.Column1, Table1.Column2, Table2.Column1, Table2.Column2,....
+From Table1
+RIGHT JOIN Table2 
+on Table1.MatchingColumnName = Table2.MatchingColumnName 
+
+# Left JOIN: Returns all record from left table, also those mathcing in right tables. 
+-- No mathcing: returns NULL values (no matching from left 左邊沒match）
+
+
+# FULL Join = UNION (using MySQL) getting all in left and right
+
+Select Table1.Column1, Table1.Column2, Table2.Column1, Table2.Column2,....
+From Table1
+LEFT JOIN Table2 on a.EmpID = b.EmpID
+UNION
+Select Table1.Column1, Table1.Column2, Table2.Column1, Table2.Column2,....
+From Table1
+RIGHT JOIN Table2 on a.EmpID = b.EmpID
+
