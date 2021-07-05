@@ -1,0 +1,42 @@
+Table point holds the x coordinate of some points on x-axis in a plane, which are all integers.
+ 
+
+Write a query to find the shortest distance between two points in these points.
+
+| x   |
+|-----|
+| -1  |
+| 0   |
+| 2   |
+ 
+The shortest distance is '1' obviously, which is from point '-1' to '0'. So the output is as below:
+ 
+| shortest|
+|---------|
+| 1       |
+
+Note: Every point is unique, which means there is no duplicates in table point.
+
+Follow-up: What if all these points have an id and are arranged from the left most to the right most of x axis?
+ 
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/shortest-distance-in-a-line
+
+# Write your MySQL query statement below
+
+-- 距離 用 abs()
+-- 最短距離 用min(abs(ａ點 - b點))  必須 inner join 才有兩個table 合併出來兩點
+-- self join (cross join 或是inner join）取出兩點 從不同的 "table" a, b 
+-- join  __ ＯＮ 兩點不是同一點的時候： 用 != 或是 <>
+-- 一定要加上 "point" a 點 或是 "point" b 才知道是 point table 
+
+
+#select min(abs(a.x - b.x)) as shortest
+#join b.x on a.x <> b.x  先看點在哪
+#from point  # join 到哪
+#from point a inner join point b 
+#on a.x != b.x
+
+select min(abs(a.x - b.x )) as shortest
+from point a inner join point b on a.x != b.x 
