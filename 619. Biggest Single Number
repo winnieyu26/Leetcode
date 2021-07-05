@@ -1,0 +1,53 @@
+Table my_numbers contains many numbers in column num including duplicated ones.
+Can you write a SQL query to find the biggest number, which only appears once.
+
++---+
+|num|
++---+
+| 8 |
+| 8 |
+| 3 |
+| 3 |
+| 1 |
+| 4 |
+| 5 |
+| 6 | 
+For the sample data above, your query should return the following result:
++---+
+|num|
++---+
+| 6 |
+Note:
+If there is no such number, just output null.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/biggest-single-number
+
+# Write your MySQL query statement beloｗ
+
+-- appears once: distinct, having count(*) = 1
+-- 大到小 order by num desc
+-- biggest : 用limit 1
+
+-- 可以使用聚合函数进行空值null值的转换，具体的聚合函数包括SUM/AVG/MAX/MIN
+-- 可以使用select语句进行转换，但空值应直接写在select中而非from中
+-- limit语句无法出现新的null值
+-- where和having同样无法出现新的null值
+
+
+<法1>
+SELECT (SELECT NUM
+        FROM MY_NUMBERS
+        GROUP BY 1
+        HAVING COUNT(*) = 1
+        ORDER BY 1 DESC
+        LIMIT 1) AS NUM;
+        
+<法2>
+select ifnull(
+              (SELECT *
+                FROM my_numbers
+                group by num
+                having count(*) = 1
+                order by num desc
+                limit 1),null) as num
