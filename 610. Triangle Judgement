@@ -1,0 +1,49 @@
+A pupil Tim gets homework to identify whether three line segments could possibly form a triangle.
+ 
+However, this assignment is very heavy because there are hundreds of records to calculate.
+ 
+
+Could you help Tim by writing a query to judge whether these three sides can form a triangle, assuming table triangle holds the length of the three sides x, y and z.
+ 
+
+| x  | y  | z  |
+|----|----|----|
+| 13 | 15 | 30 |
+| 10 | 20 | 15 |
+For the sample data above, your query should return the follow result:
+| x  | y  | z  | triangle |
+|----|----|----|----------|
+| 13 | 15 | 30 | No       |
+| 10 | 20 | 15 | Yes      |
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/triangle-judgement
+
+## Case When ###
+-- 都是 用 ＡＮＤ
+SELECT x,y,z,
+    CASE WHEN x + y > z AND x + z > y AND y + z > x THEN 'Yes'
+        ELSE 'No'
+    END AS 'triangle'
+FROM triangle
+;
+
+### IF ### 
+if ((1 or/and 2, or/and 3), 是的話 得出"__", 不是的話 得出"__") 把它叫做 as triangle
+
+三角 兩邊和 > 第三邊 是三角型
+-- 都是 用 AND
+select x,y,z,
+if ((x+y>z AND y+z>x AND x+z>y),"Yes","No") as triangle
+from triangle 
+
+
+三角 兩邊和 < 第三邊 就不是三角型
+-- 都不是 用 ＯＲ
+-- if ((1 or 2, or 3), 是的話 得出"No", 不是的話 得出"Yes") 把它叫做 as triangle
+from 剛剛命名的 triangle
+
+select x, y, z,
+if ((x + y <= z or x + z <= y or y + z <= x), "No", "Yes") as triangle
+from triangle;
+
