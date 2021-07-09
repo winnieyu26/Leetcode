@@ -62,15 +62,57 @@ The buyer with id 1 bought an S8 but didn't buy an iPhone. The buyer with id 3 b
 
 # Write your MySQL query statement below
 
+# Write your MySQL query statement below
+
 -- 1. buyers who have bought S8 but not iPhone: product_name= "S8" AND product_name != "iPhone"  
 -- sales 的 buyer_id 
 
-select s.buyer_id as buyer_id
-from product P
-inner join sales s ON s.product_id = p.product_id
-group by buyer_id
-where product_name= "S8" AND 
-product_name != "iPhone"   ### 錯了  
+# Write your MySQL query statement below
+
+-- best seller by total sales price, If there is a tie, report them all.
+# 法 １
+# having sum(p. = 'S8') >=1  AND sum(p. = 'iPhone') = 0
+                    --> 有S8                 --> 沒iphone
+select s.buyer_id
+from product p 
+inner join sales s on p.product_id = s.product_id
+group by s.buyer_id
+having sum(p.product_name = 'S8') >= 1 AND sum(p.product_name = 'iPhone') = 0
+
+#或是 用 count if 或 sum >=1 代表買了, =0 代表沒買
+SELECT S.buyer_id
+FROM Sales S JOIN Product P
+ON S.product_id = P.product_id
+GROUP BY S.buyer_id
+having sum(p.product_name='S8') >= 1 and sum(p.product_name='iphone') =0
+或是
+having COUNT(IF(P.product_name = 'S8',TRUE, NULL)) >= 1 AND COUNT(IF(P.product_name = 'iPhone',TRUE, NULL)) = 0
+
+
+# 錯 me 
+select distinct s.buyer_id
+from Sales as s, Product as p 
+-- where s.product_id=p.product_id and p.product_name = 'S8'  ## 錯！！！
+group by p.product_name
+
+
+# 法 ２ GROUP_CONCAT
+# returns a string with concatenated non-NULL value from a group.
+# Returns NULL when there are no non-NULL values.
+SELECT buyer_id
+FROM Sales S LEFT JOIN Product P ON S.Product_id = P.Product_id
+GROUP BY buyer_id
+HAVING GROUP_CONCAT(product_name) LIKE '%S8%' and GROUP_CONCAT(product_name) NOT LIKE '%iPhone%'
+
+
+# 法 3
+select distinct buyer_id   --> 選unique的 id 用 "distinct"
+from Sales s join Product p on s.product_id=p.product_id
+where p.product_name='S8' 
+and buyer_id not in   --> why 不能直接 p.product_name ！='iPhone'?? 要用 NOT IN
+   (select buyer_id
+   from Sales s join Product p on s.product_id=p.product_id
+   where p.product_name='iPhone')
 
 
 # 用 where in , where not in 
@@ -86,14 +128,4 @@ AND BUYER_ID NOT IN (SELECT BUYER_ID
                      WHERE PRODUCT_ID = (SELECT PRODUCT_ID
                                          FROM PRODUCT
                                          WHERE PRODUCT_NAME = 'iPhone'));
-
-# 用 count if 或 sum >=1 代表買了, =0 代表沒買
-SELECT S.buyer_id
-FROM Sales S JOIN Product P
-ON S.product_id = P.product_id
-GROUP BY S.buyer_id
-having sum(p.product_name='S8') >= 1 and sum(p.product_name='iphone') =0
-或是
-HAVING COUNT(IF(P.product_name = 'S8',TRUE, NULL)) >= 1 AND COUNT(IF(P.product_name = 'iPhone',TRUE, NULL)) = 0
-
 
