@@ -1,0 +1,40 @@
+# Write your MySQL query statement below
+
+-- best seller by total sales price, If there is a tie, report them all.
+#max和all函数 是一样的， all和每一个进行比较（> MAX的 或者 < min的）
+#any 则是>任何一个都可以（>min的，<max的）
+
+
+-- 记住！MySQL不能叠加MAX()和SUM()，比如MAX(SUM())
+# METHOD 1 EQUAL TO MAX:    
+--> 找最大值：select sum() group by __ order by sum() desc limit 1
+
+select s.seller_id from sales s --> best seller 要用seller_id NOT buyer
+-- 問# inner join product p ON p.product_id = s.product_id  --> 不用這行 直接group by seller_id
+group by seller_id
+having sum(price) = (select sum(price) from Sales s 
+                    group by seller_id 
+                    order by sum(price) desc 
+                    limit 1) --> 要order by sum(price) 是總價
+                
+
+# METHOD 2: sum(price) >= all()
+                            -->all(到group by 就好 不用oder by sum() desc   limit 1 因為是全部)
+SELECT SELLER_ID
+FROM SALES
+GROUP BY SELLER_ID
+HAVING SUM(PRICE) >= ALL (SELECT SUM(PRICE)
+                          FROM SALES
+                          GROUP BY SELLER_ID);
+                
+
+                        
+# METHOD 3: dense_rank (If there is a tie, report all)
+
+select SELLER_ID 
+from(select SELLER_ID dense_rank() over(order by price desc)) as rnk --> 是order by sum(price總價) 不是只有price
+        from Sales  
+        group by seller_id) --> 記得是要group by 
+where rnk=1  --> 記得 where 選第一個！   像是limit 1
+
+
