@@ -1,0 +1,50 @@
+# Leetcode
+sum+if+between
+如果在内部0，否则1。sum()=0，说明没有在外部
+
+# Write your MySQL query statement below
+select
+    p.product_id,
+    product_name
+from
+    product p left join sales s
+    on p.product_id = s.product_id
+group by
+    p.product_id
+having
+    sum(if(sale_date between '2019-01-01' and '2019-03-31',0,1)) = 0 #如果在内部0，否则1。sum()=0，说明没有在外部
+
+
+
+先JOIN后WHERE NOT IN也可用。
+要点：1、DISTINCT；
+2、用DATEDIFF函数控制时间范围； 
+
+SELECT DISTINCT S.product_id, P.product_name FROM Sales AS S 
+INNER JOIN Product AS P ON S1.product_id = P1.product_id 
+WHERE S.product_id 
+NOT IN (SELECT S2.product_id FROM Sales AS S2 
+                           WHERE DATEDIFF('2019-03-31', S2.sale_date) <0 OR DATEDIFF(S2.sale_date, '2019-01-01') <0
+                           
+                           
+                           
+# Write your MySQL query statement below
+with t as(
+select Sales.*,Product.product_name,if(sale_date between '2019-01-01' and '2019-03-31',0,1) as date_flag
+from Sales join Product 
+on Sales.product_id= Product.product_id
+
+
+
+
+select product_id, product_name
+from Sales join Product
+using(product_id)
+group by product_id
+having sum(sale_date between "2019-01-01" and "2019-03-31") = count(sale_date))
+
+select product_id,product_name
+from t
+group by product_id,product_name
+having sum(date_flag)=0
+
