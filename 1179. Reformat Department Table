@@ -1,0 +1,104 @@
+Table: Department
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| id            | int     |
+| revenue       | int     |
+| month         | varchar |
++---------------+---------+
+(id, month) is the primary key of this table.
+The table has information about the revenue of each department per month.
+The month has values in ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].
+ 
+
+Write an SQL query to reformat the table such that there is a department id column and a revenue column for each month.
+
+The query result format is in the following example:
+
+Department table:
++------+---------+-------+
+| id   | revenue | month |
++------+---------+-------+
+| 1    | 8000    | Jan   |
+| 2    | 9000    | Jan   |
+| 3    | 10000   | Feb   |
+| 1    | 7000    | Feb   |
+| 1    | 6000    | Mar   |
++------+---------+-------+
+
+Result table:
++------+-------------+-------------+-------------+-----+-------------+
+| id   | Jan_Revenue | Feb_Revenue | Mar_Revenue | ... | Dec_Revenue |
++------+-------------+-------------+-------------+-----+-------------+
+| 1    | 8000        | 7000        | 6000        | ... | null        |
+| 2    | 9000        | null        | null        | ... | null        |
+| 3    | null        | 10000       | null        | ... | null        |
++------+-------------+-------------+-------------+-----+-------------+
+
+Note that the result table has 13 columns (1 for the department id + 12 for the months).
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/reformat-department-table
+
+
+# Write your MySQL query statement below
+-- Write an SQL query to reformat the table such that there is a department id column and a revenue column for each month.
+
+SELECT d1.id AS 'id',
+    SUM(CASE d1.month WHEN 'Jan' THEN revenue ELSE NULL END) AS 'Jan_Revenue',
+    SUM(CASE d1.month WHEN 'Feb' THEN revenue ELSE NULL END) AS 'Feb_Revenue',
+    SUM(CASE d1.month WHEN 'Mar' THEN revenue ELSE NULL END) AS 'Mar_Revenue',
+    SUM(CASE d1.month WHEN 'Apr' THEN revenue ELSE NULL END) AS 'Apr_Revenue',
+    SUM(CASE d1.month WHEN 'May' THEN revenue ELSE NULL END) AS 'May_Revenue',
+    SUM(CASE d1.month WHEN 'Jun' THEN revenue ELSE NULL END) AS 'Jun_Revenue',
+    SUM(CASE d1.month WHEN 'Jul' THEN revenue ELSE NULL END) AS 'Jul_Revenue',
+    SUM(CASE d1.month WHEN 'Aug' THEN revenue ELSE NULL END) AS 'Aug_Revenue',
+    SUM(CASE d1.month WHEN 'Sep' THEN revenue ELSE NULL END) AS 'Sep_Revenue',
+    SUM(CASE d1.month WHEN 'Oct' THEN revenue ELSE NULL END) AS 'Oct_Revenue',
+    SUM(CASE d1.month WHEN 'Nov' THEN revenue ELSE NULL END) AS 'Nov_Revenue',
+    SUM(CASE d1.month WHEN 'Dec' THEN revenue ELSE NULL END) AS 'Dec_Revenue'
+FROM Department AS d1
+GROUP BY d1.id
+;
+
+select id,
+    sum(case month when 'Jan' then revenue end) as Jan_Revenue,
+    sum(case month when 'Feb' then revenue end) as Feb_Revenue,
+    sum(case month when 'Mar' then revenue end) as Mar_Revenue,
+    sum(case month when 'Apr' then revenue end) as Apr_Revenue,
+    sum(case month when 'May' then revenue end) as May_Revenue,
+    sum(case month when 'Jun' then revenue end) as Jun_Revenue,
+    sum(case month when 'Jul' then revenue end) as Jul_Revenue,
+    sum(case month when 'Aug' then revenue end) as Aug_Revenue,
+    sum(case month when 'Sep' then revenue end) as Sep_Revenue,
+    sum(case month when 'Oct' then revenue end) as Oct_Revenue,
+    sum(case month when 'Nov' then revenue end) as Nov_Revenue,
+    sum(case month when 'Dec' then revenue end) as Dec_Revenue
+from Department
+group by id
+
+
+select distinct id,
+    SUM(IF(d1.month = 'Jan', revenue, NULL)) AS 'Jan_Revenue',
+    SUM(IF(d1.month = 'Feb', revenue, NULL)) AS 'Feb_Revenue',
+    SUM(IF(d1.month = 'Mar', revenue, NULL)) AS 'Mar_Revenue',
+    SUM(IF(d1.month = 'Apr', revenue, NULL)) AS 'Apr_Revenue',
+    SUM(IF(d1.month = 'May', revenue, NULL)) AS 'May_Revenue',
+    SUM(IF(d1.month = 'Jun', revenue, NULL)) AS 'Jun_Revenue',
+    SUM(IF(d1.month = 'Jul', revenue, NULL)) AS 'Jul_Revenue',
+    SUM(IF(d1.month = 'Aug', revenue, NULL)) AS 'Aug_Revenue',
+    SUM(IF(d1.month = 'Sep', revenue, NULL)) AS 'Sep_Revenue',
+    SUM(IF(d1.month = 'Oct', revenue, NULL)) AS 'Oct_Revenue',
+    SUM(IF(d1.month = 'Nov', revenue, NULL)) AS 'Nov_Revenue',
+    SUM(IF(d1.month = 'Dec', revenue, NULL)) AS 'Dec_Revenue'
+FROM Department AS d1
+GROUP BY d1.id
+;
+
+
+# T-SQL
+SELECT * FROM(
+SELECT id,revenue,month + '_Revenue' month
+FROM Department) tb
+PIVOT(MAX(revenue) FOR month IN([Jan_Revenue],[Feb_Revenue],[Mar_Revenue],[Apr_Revenue],[May_Revenue],[Jun_Revenue],[Jul_Revenue],[Aug_Revenue],[Sep_Revenue],[Oct_Revenue],[Nov_Revenue],[Dec_Revenue])) T
