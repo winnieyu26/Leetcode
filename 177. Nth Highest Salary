@@ -1,0 +1,37 @@
+Write a SQL query to get the nth highest salary from the Employee table.
+
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+For example, given the above Employee table, the nth highest salary where n = 2 is 200. If there is no nth highest salary, then the query should return null.
+
++------------------------+
+| getNthHighestSalary(2) |
++------------------------+
+| 200                    |
++------------------------+
+
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/nth-highest-salary
+
+
+
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  RETURN (
+      # Write your MySQL query statement below.
+        SELECT 
+            DISTINCT salary --> DISTINCT 去重複
+        FROM 
+            (SELECT 
+                salary, dense_rank() over(ORDER BY salary DESC) AS rnk --> DENSE_rank() over(order by DESC ) as rnk
+             FROM 
+                employee) tmp  --> from __取個名 
+        WHERE rnk = N  --> rnk = n 第Ｎ個
+  );
+END
