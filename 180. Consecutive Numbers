@@ -42,3 +42,77 @@ Result table:
 链接：https://leetcode-cn.com/problems/consecutive-numbers
 
 
+# Write your MySQL query statement below
+# Zihao:
+with t as (     --> 先創一個temp table 
+    select num, 
+        lead(num, 1) over() as num1,   --> 把第1行 後面的往上移 到第2列
+        lead(num, 2) over() as num2    --> 把第2行 後面的往上移 到第3列
+    from logs
+)
+
+select distinct num as ConsecutiveNums   --> Num 要distinct （join 可能會有重複3）
+from t
+where num = num1 and num1 = num2;
+
+
+# chengwu
+SELECT DISTINCT l1.Num AS ConsecutiveNums  --> Num 要distinct （join 可能會有重複3）
+FROM
+    Logs l1
+join # = inner join
+    Logs l2
+on l2.Id - l1.Id = 1  --> 連續的id: join on "ID相減＝1"
+and l1.Num = l2.Num   --> 排名same
+join 
+    Logs l3
+on l3.Id - l2.Id = 1 --> 連續的id: join on "ID相減＝1"
+and l2.Num = l3.Num  --> 排名same
+
+
+
+# ANS
+SELECT DISTINCT Num FROM (
+SELECT Num,COUNT(1) as SerialCount FROM 
+(SELECT Id,Num,
+row_number() over(order by id) -
+ROW_NUMBER() over(partition by Num order by Id) as SerialNumberSubGroup
+FROM ContinueNumber) as Sub
+GROUP BY Num,SerialNumberSubGroup HAVING COUNT(1) >= 3) as Result
+
+#select Id as ConsecutiveNums from Logs
+#having sum(Num) >= 3
+
+方法：用 DISTINCT 和 WHERE 语句
+连续出现的意味着相同数字的 Id 是连着的，由于这题问的是至少连续出现 3 次，我们使用 Logs 并检查是否有 3 个连续的相同数字。
+#MySQL 2 - step 1
+SELECT *
+FROM
+    Logs l1,
+    Logs l2,
+    Logs l3
+WHERE
+    l1.Id = l2.Id - 1
+    AND l2.Id = l3.Id - 1
+    AND l1.Num = l2.Num
+    AND l2.Num = l3.Num
+;
+Id	Num	Id	Num	Id	Num
+1	1	2	1	3	1
+注意：前两列来自 l1 ，接下来两列来自 l2 ，最后两列来自 l3 。
+然后我们从上表中选择任意的 Num 获得想要的答案。同时我们需要添加关键字 DISTINCT ，因为如果一个数字连续出现超过 3 次，会返回重复元素。
+
+SELECT DISTINCT -- step 2
+    l1.Num AS ConsecutiveNums
+FROM
+    Logs l1,
+    Logs l2,
+    Logs l3
+WHERE
+    l1.Id = l2.Id - 1
+    AND l2.Id = l3.Id - 1
+    AND l1.Num = l2.Num
+    AND l2.Num = l3.Num
+;
+
+
