@@ -49,7 +49,7 @@ Note that for each player we only care about the days when the player logged in.
 
 # Write your MySQL query statement below
 
-# 第一步：自联结
+# 第一步：join
 select t1.player_id,t1.event_date
 from Activity t1,Activity t2      
 where t1.player_id=t2.player_id
@@ -65,7 +65,9 @@ select t1.player_id,
        t1.event_date,
        sum(t2.games_played) games_played_so_far
 from Activity t1, Activity t2
-where t1.player_id = t2.player_id
-  and t1.event_date >= t2.event_date    --> id 相同
-group by t1.player_id, t1.event_date    --> 3/1 之前的 或是 5/2之前的
+where t1.player_id = t2.player_id      --> id 相同
+  and t1.event_date >= t2.event_date   --> 3/1 之前的 或是 5/2之前的
+group by t1.player_id, t1.event_date   --> 記得group by
+
+
 
