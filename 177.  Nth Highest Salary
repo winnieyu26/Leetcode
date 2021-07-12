@@ -1,0 +1,130 @@
+
+Write a SQL query to get the nth highest salary from the Employee table.
+
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+For example, given the above Employee table, the nth highest salary where n = 2 is 200. If there is no nth highest salary, then the query should return null.
+
++------------------------+
+| getNthHighestSalary(2) |
++------------------------+
+| 200                    |
++------------------------+
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/nth-highest-salary
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+# 法1: dense_rank
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  RETURN (
+      # Write your MySQL query statement below.
+        SELECT 
+            DISTINCT salary --> DISTINCT 去重複
+        FROM 
+            (SELECT 
+                salary, dense_rank() over(ORDER BY salary DESC) AS rnk --> DENSE_rank() over(order by DESC ) as rnk
+             FROM 
+                employee) tmp  --> from __取個名 
+        WHERE rnk = N  --> rnk = n 第Ｎ個
+  );
+END
+
+
+
+# 法2 先set n: = n-1, 
+# 後面select from, group by, order by desc, limit n, 1
+no分组排序，return 第N高的一个--> 用order by排序加limit限制得到。需要注意两个细节：
+
+同薪同名且不跳级 1,1,2--> 用group by按薪水分组后再order by
+排名第N要跳过N-1个薪水，不能直接用limit N-1，所以需先在函数开头处理N为N=N-1。
+注：不能直接用limit N-1是因为limit和offset字段后面只接受"正整数" (0、负数、小数都不行)）或者单一变量（意味着不能用表达式），
+也就是说想取一条，limit 2-1、limit 1. 错的。
+注：这种解法适用于查询全局排名问题，如果要求各分组的每个第N名，则该方法不适用；而且也不能处理存在重复值的情况。
+
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+    SET N := N-1;
+  RETURN (
+      # Write your MySQL query statement below.
+      SELECT 
+            salary
+      FROM 
+            employee
+      GROUP BY 
+            salary
+      ORDER BY 
+            salary DESC
+      LIMIT N, offset 1
+  );
+END
+
+
+
+之前用limit N 1, offest 1一直报错，
+limit 1, 2就是代表从第一行开始 下一行，检索从第二行开始，然后再往下2行，所以最终返回的是2-4行
+因为我们需要找到工资第N高的, 且limit从第一行开始算,因此偏移量就为N-1
+
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+    set N = N - 1;
+  RETURN (
+      # Write your MySQL query statement below.
+      select IFNULL((select distinct Salary
+      from Employee
+      order by Salary DESC
+      limit N, 1), NULL)
+  );
+END
+
+
+排名第N的薪水意味着该表中存在N-1个比其更高的薪水
+注意这里的N-1个更高的薪水是指去重后的N-1个，实际对应人数可能不止N-1个
+最后返回的薪水也应该去重，因为可能不止一个薪水排名第N
+由于对于每个薪水的where条件都要执行一遍子查询，注定其效率低下
+
+#mysql
+
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  RETURN (
+      # Write your MySQL query statement below.
+      SELECT 
+          DISTINCT e.salary
+      FROM 
+          employee e
+      WHERE 
+          (SELECT count(DISTINCT salary) FROM employee WHERE salary>e.salary) = N-1
+  );
+END
+
+
+# join
+两表自连接，连接条件设定为表1的salary小于表2的salary
+以表1的salary分组，统计表1中每个salary分组后对应表2中salary唯一值个数，即去重
+步骤2中having 计数个数为N-1，分组中表1salary排名为第N个
+考虑N=1的特殊情形(特殊是因为N-1=0，计数要求为0)，此时不存在满足条件的，需返回结果，所以连接用left join
+如果仅查询薪水这一项值，不用left join也可以，只需把连接条件放宽至<=、同时查询个数设置为N即可。因为连接条件含等号，所以一定不为空，用join即可。
+
+#mysql
+
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  RETURN (
+      # Write your MySQL query statement below.
+      SELECT 
+          e1.salary
+      FROM 
+          employee e1 JOIN employee e2 ON e1.salary <= e2.salary
+      GROUP BY 
+          e1.salary
+      HAVING 
+          count(DISTINCT e2.salary) = N
+  );
+END
