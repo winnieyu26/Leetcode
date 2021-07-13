@@ -1,0 +1,81 @@
+# The Employee table holds all employees. Every employee has an Id, a salary, and there is also a column for the department Id.
+
++----+-------+--------+--------------+
+| Id | Name  | Salary | DepartmentId |
++----+-------+--------+--------------+
+| 1  | Joe   | 70000  | 1            |
+| 2  | Jim   | 90000  | 1            |
+| 3  | Henry | 80000  | 2            |
+| 4  | Sam   | 60000  | 2            |
+| 5  | Max   | 90000  | 1            |
++----+-------+--------+--------------+
+The Department table holds all departments of the company.
+
++----+----------+
+| Id | Name     |
++----+----------+
+| 1  | IT       |
+| 2  | Sales    |
++----+----------+
+Write a SQL query to find employees who have the highest salary in each of the departments. For the above tables, your SQL query should return the following rows (order of rows does not matter).
+
++------------+----------+--------+
+| Department | Employee | Salary |
++------------+----------+--------+
+| IT         | Max      | 90000  |
+| IT         | Jim      | 90000  |
+| Sales      | Henry    | 80000  |
++------------+----------+--------+
+Explanation:
+
+Max and Jim both have the highest salary in the IT department and Henry has the highest salary in the Sales department.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/department-highest-salary
+
+
+# Write your MySQL query statement below
+
+# 法１ dense_rank() 或是 rank
+
+-- find employees who have the highest salary in each of the departments. 
+select Department, Employee, Salary
+from 
+(select 
+    D.Name as Department, E.Name as Employee, E.Salary as Salary, 
+    dense_rank() over(partition by D.Name order by E.Salary desc) as rnk -- 多創個column 排序 1,2,3
+    -- dense_rank 或是 rank 都可以, 記得後面要where rnk = 1
+    -- in each of the departments 用partition by department (D.Name)
+    -- order by 大到小 desc
+from Employee E join Department D on E.DepartmentId = D.Id  --> 是 Employee 的 department id 和 Department id 連 （都是department id)
+) as tmp
+where rnk = 1  --選那個 多創個col 排序1的
+
+
+# 法２ join
+SELECT
+    Department.name AS Department,
+    Employee.name AS Employee,
+    Salary
+FROM
+    Employee e
+        JOIN Department d ON e.DepartmentId = d.Id
+WHERE
+    (e.DepartmentId , Salary) IN  --用 IN 查dep.和Salary的关系。
+        (SELECT DepartmentId, MAX(Salary)
+            FROM Employee
+            GROUP BY DepartmentId);
+
+
+
+| DepartmentId | MAX(Salary) |
+|--------------|-------------|
+| 1            | 90000       |
+| 2            | 80000       |
+
+-- in 之後
+| Department | Employee | Salary |
+|------------|----------|--------|
+| Sales      | Henry    | 80000  |
+| IT         | Max      | 90000  |
+
