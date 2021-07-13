@@ -1,0 +1,25 @@
+# Write your MySQL query statement below
+
+# 法 １
+select AVG(question_id) as survey_log
+from survey_log
+GROUP BY question_id   --> 又忘記 group by 
+ORDER BY SUM(if(action = "answer", 1, 0)) / SUM(if(action = "show", 1, 0)) DESC   --> 找MAX: ORDER BY LIMIT 1 
+        -- OR: SUM(if(action = "answer", 1, 0)) / count(*)
+LIMIT 1
+
+
+
+# 法 ２
+select question_id as survey_log
+from (
+  select
+      question_id,
+      sum(if(action = 'answer', 1, 0)) as AnswerCnt,
+      sum(if(action = 'show', 1, 0)) as ShowCnt
+  from
+      survey_log
+  group by question_id
+) as t
+order by (AnswerCnt / ShowCnt) desc
+limit 1
