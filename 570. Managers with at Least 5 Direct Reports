@@ -1,0 +1,36 @@
+The Employee table holds all employees including their managers. Every employee has an Id, and there is also a column for the manager Id.
+
++------+----------+-----------+----------+
+|Id    |Name 	  |Department |ManagerId |
++------+----------+-----------+----------+
+|101   |John 	  |A 	      |null      |
+|102   |Dan 	  |A 	      |101       |
+|103   |James 	  |A 	      |101       |
+|104   |Amy 	  |A 	      |101       |
+|105   |Anne 	  |A 	      |101       |
+|106   |Ron 	  |B 	      |101       |
++------+----------+-----------+----------+
+Given the Employee table, write a SQL query that finds out managers with at least 5 direct report. For the above table, your SQL query should return:
+
++-------+
+| Name  |
++-------+
+| John  |
++-------+
+Note:
+No one would report to himself.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/managers-with-at-least-5-direct-reports
+
+
+
+# Write your MySQL query statement below
+-- managers at least 5 direct report
+
+SELECT e1.Name AS 'Name'
+FROM Employee AS e1
+    INNER JOIN Employee AS e2  
+        ON e1.Id = e2.ManagerId --> join on 表1的id = 表2的manager
+GROUP BY e2.ManagerId     --> 忘記要 group by！ 第二個表的
+HAVING COUNT(e1.Id) >= 5   --> 不用 is not null
