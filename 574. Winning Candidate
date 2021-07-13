@@ -1,0 +1,48 @@
+Table: Candidate
+
++-----+---------+
+| id  | Name    |
++-----+---------+
+| 1   | A       |
+| 2   | B       |
+| 3   | C       |
+| 4   | D       |
+| 5   | E       |
++-----+---------+  
+Table: Vote
+
++-----+--------------+
+| id  | CandidateId  |
++-----+--------------+
+| 1   |     2        |
+| 2   |     4        |
+| 3   |     3        |
+| 4   |     2        |
+| 5   |     5        |
++-----+--------------+
+id is the auto-increment primary key,
+CandidateId is the id appeared in Candidate table.
+Write a sql to find the name of the winning candidate, the above example will return the winner B.
+
++------+
+| Name |
++------+
+| B    |
++------+
+Notes:
+
+You may assume there is no tie, in other words there will be only one winning candidate.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/winning-candidate
+
+
+
+# Write your MySQL query statement below
+
+select c.Name as Name
+from Candidate c
+inner join Vote v ON c.id = v.candidateid  -- left join id = CandidateId 也可
+group by CandidateId      -- 又忘記 group by  先分組 才能排序
+order by COUNT(CandidateId) desc limit 1  -- 最大的算法： order by desc limit 1
+
