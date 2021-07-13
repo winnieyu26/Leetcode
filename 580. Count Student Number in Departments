@@ -62,7 +62,7 @@ select d.dept_name,
 from student s
 right join department d ON s.dept_id = d.dept_id   --> 是left/right join, NOT Inner
 group by d.dept_name                      --> 不是group by "id"
-order by student_number desc,dept_name    --> 又忘記desc, 也要group by dept_name!!
+order by student_number desc,dept_name    --> 又忘記desc, why要group by dept_name!?
 
 
 
