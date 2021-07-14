@@ -1,0 +1,116 @@
+Write a query to print the sum of all total investment values in 2016 (TIV_2016), to a scale of 2 decimal places, for all policy holders who meet the following criteria:
+
+Have the same TIV_2015 value as one or more other policyholders.
+Are not located in the same city as any other policyholder (i.e.: the (latitude, longitude) attribute pairs must be unique).
+Input Format:
+The insurance table is described as follows:
+
+| Column Name | Type          |
+|-------------|---------------|
+| PID         | INTEGER(11)   |
+| TIV_2015    | NUMERIC(15,2) |
+| TIV_2016    | NUMERIC(15,2) |
+| LAT         | NUMERIC(5,2)  |
+| LON         | NUMERIC(5,2)  |
+where PID is the policyholder's policy ID, TIV_2015 is the total investment value in 2015, TIV_2016 is the total investment value in 2016, LAT is the latitude of the policy holder's city, and LON is the longitude of the policy holder's city.
+
+Sample Input
+
+| PID | TIV_2015 | TIV_2016 | LAT | LON |
+|-----|----------|----------|-----|-----|
+| 1   | 10       | 5        | 10  | 10  |
+| 2   | 20       | 20       | 20  | 20  |
+| 3   | 10       | 30       | 20  | 20  |
+| 4   | 10       | 40       | 40  | 40  |
+Sample Output
+
+| TIV_2016 |
+|----------|
+| 45.00    |
+Explanation
+
+The first record in the table, like the last record, meets both of the two criteria.
+The TIV_2015 value '10' is as the same as the third and forth record, and its location unique.
+
+The second record does not meet any of the two criteria. Its TIV_2015 is not like any other policyholders.
+
+And its location is the same with the third record, which makes the third record fail, too.
+
+So, the result is the sum of TIV_2016 of the first and last record, which is 45.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/investments-in-2016
+
+
+
+
+# Write your MySQL query statement below
+
+-- the sum of all total investment values in 2016 (TIV_2016)
+# 條件
+-- 1. Have the same TIV_2015 value as one or more other policyholders.
+-- 2.  not located in the same city as any other policyholder 
+      (i.e.: the (latitude, longitude) attribute pairs must be unique).
+
+链接：https://leetcode-cn.com/problems/investments-in-2016
+
+
+------------------------------------------------------------------------------------
+# 分析題目 有四種解法
+
+1. ① count() over() 统计 + select + where 
+select
+    sum(tmp1.TIV_2016) as TIV_2016
+from(select
+        *,
+        count(1) over(partition by TIV_2015) as r1,
+        count(1) over(partition by LAT,LON) as r2
+    from insurance 
+    )tmp1
+where tmp1.r1>1 and tmp1.r2=1  -- same TIV_2015 value as one or more other policyholders.
+
+----------------------------------------------------------------------------------
+2. 
+②. -- where __ in + 条件筛选（select + group by + having）
+
+select sum(TIV_2016) as TIV_2016
+from insurance
+where TIV_2015 in (select TIV_2015 from insurance group by TIV_2015 having(count(1)>1))
+    -- same TIV_2015 value as one or more other policyholders 
+    --> select A + group by A 就是partition by的用法 + having(count(1)>1)  
+and  (LAT,LON) in (select LAT,LON from insurance group by LAT,LON having(count(1)=1)
+    -- not located in the same city,   UNIQUE一個 ＝ count() = 1
+        --> select AB + group by AB 就是partition by AB + having(count(1)=1)
+
+------------------------------------------------------------------------------------
+3. 
+    # 條件 where exists(select + where __ AND __ ) + not exists(select + where __ AND __ )
+
+select sum(TIV_2016) as TIV_2016
+from insurance i1
+where exists
+        (select * from insurance i2 
+        where i1.PID != i2.PID AND i1.TIV_2015 = i2.TIV_2015) 
+    --> 不同id + 多個同2015: i1.TIV_2015 = i2.TIV_2015   
+and
+not exists   -- 但坐标unique: LAT, LON 不一樣 
+        (select * from insurance i3 
+        where i1.PID != i3.PID AND i1.LAT = i3.LAT and i1.LON = i3.LON )
+    -->  不同id + 刪掉不同id 但一樣的座標 LAT=LAT LON=LON 分別一樣 (不是LAT = LON)
+------------------------------------------------------------------------------------
+4. 
+   # 1. 判断值在某一列中是不是唯一的 --> 用 GROUP BY 和 COUNT。
+    #2. TIV_2015 是否是唯一的，如果不是唯一的且坐标是唯一的 --> 符合题目 统计到答案中。
+
+SELECT SUM(insurance.TIV_2016) AS TIV_2016
+FROM insurance
+WHERE
+    insurance.TIV_2015 IN
+    (SELECT TIV_2015 FROM insurance
+      GROUP BY TIV_2015
+      HAVING COUNT(*) > 1)
+    AND CONCAT(LAT, LON) IN
+    (SELECT CONCAT(LAT, LON) FROM insurance
+      GROUP BY LAT , LON
+      HAVING COUNT(*) = 1);
+
