@@ -1,0 +1,53 @@
+
+Suppose that a website contains two tables, the Customers table and the Orders table. Write a SQL query to find all customers who never order anything.
+
+Table: Customers.
+
++----+-------+
+| Id | Name  |
++----+-------+
+| 1  | Joe   |
+| 2  | Henry |
+| 3  | Sam   |
+| 4  | Max   |
++----+-------+
+Table: Orders.
+
++----+------------+
+| Id | CustomerId |
++----+------------+
+| 1  | 3          |
+| 2  | 1          |
++----+------------+
+Using the above tables as example, return the following:
+
++-----------+
+| Customers |
++-----------+
+| Henry     |
+| Max       |
++-----------+
+
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/customers-who-never-order
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Write your MySQL query statement below
+
+select c.Name as Customers 
+from Customers c 
+left join Orders o ON c.Id = o.CustomerId   
+# having count(Customers) = 0  --> null 才對 要用 where is null
+where o.Id is null;   --> 不能說where Customers is null 因為是 o.Id join完後沒有對應到的
+
+https://leetcode-cn.com/problems/customers-who-never-order/solution/tu-jie-sqlmian-shi-ti-cha-zhao-bu-zai-biao-li-de-s/
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+# NOT IN 查不在此列表中的客户: 不用join
+select c.Name as Customers 
+from Customers c 
+# left join Orders o ON c.Id = o.CustomerId   
+where c.Id not in (select Id from Orders) --> 上表id 不在下表customerid的
+
