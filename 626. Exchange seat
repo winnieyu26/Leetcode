@@ -32,35 +32,72 @@ Note:
 
 If the number of students is odd, there is no need to change the last one's seat.
 
-
-
 来源：力扣（LeetCode）
 链接：https://leetcode-cn.com/problems/exchange-seats
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。#
 
-#Write your MySQL query statement below
+----------------------------------------------------------------------------------
+
+# Write your MySQL query statement below
 -- The column id is continuous increment.
 -- Mary wants to change seats for the adjacent students.
 
 -- Can you write a SQL query to output the result for Mary
 # 法 １：查询id和student
 
-若id是偶数，减1
-若id是奇数，加1
-主要问题在于当总数为奇数时，最后一个id应保持不变，加1会导致空出一位。
+若id是偶数，减1 (往前一個)
+若id是奇数 兩種可能 --> 1. 加1 (id 往前一個)   
+                 --> 2. last low 不變
+问题在于当总数为奇数时，最后一个id应保持不变，加1会导致空出一位。
 解决此问题并不复杂：我们找到最后一位，让它保持不变就可以了。
 select 
-    if(id%2=0,
-        id-1,
+    if(id%2=0, id-1,
         if(id=(select count(distinct id) from seat),
-            id,
-            id+1)) 
-    as id,student 
+            id, id+1)) 
+    as id,
+    student 
 from seat 
 order by id;
 
 https://github.com/Fanlu91/FanluLeetcode
 
+-------------------------------------------------------------------------------
+
+# 法 3 output table 根源table 比較= 偶數-1 奇數+1 得出最後一個數是6 最後一個數應該是5, 
+# 所以用row_num把他連起來1,2,3,4,6 --> 1,2,3,4,5
+
+# if
+select row_number() over(
+    order by (if(id % 2 = 0, id-1, id+1)
+) as id,
+student
+from seat;
+-------------------------------------------------------------------------------
+
+# case when
+select row_number() over(
+    order by (case when id % 2 = 0 then id-1 else id+1 end)
+) as id,
+student
+from seat;
+-------------------------------------------------------------------------------
+
+#用 new table 
+with t as(
+    select case when id % 2 = 0 then id-1 else id+1 end as id, student
+    from seat 
+)
+select row_number() over(
+    order by id
+) as id,
+student
+from t;
+
+-------------------------------------------------------------------------------
+id是相邻的，将奇数的学生位置 跟 相邻的偶数号 位置互换
+（如果奇数没有相邻的偶数号位置 则不需要换座）
+1、找出奇数号位置的学生
+2、找出奇数位相邻的偶数位学生（如果最大id是奇数位学生，则排除）
+3、相邻学生实现换做
 
 # 法二：使用位操作和 COALESCE()
 -- 使用 (id+1)^1-1 计算交换后每个学生的座位 id。
@@ -75,7 +112,7 @@ SELECT id, (id+1)^1-1, student FROM seat;
 | 5  | 6          | Jeames  |
 
 
-然后连接原来的座位表和更新 id 后的座位表。
+连接原来的座位表和更新 id 后的座位表
 SELECT *
 FROM seat s1
     LEFT JOIN seat s2 ON (s1.id+1)^1-1 = s2.id
