@@ -59,33 +59,29 @@ Both employees with id 1 and 3 have the most experience among the employees of t
 链接：https://leetcode-cn.com/problems/project-employees-iii
 
 
-
 # Write your MySQL query statement below
-select newtable.project_id as project_id, newtable.employee_id as employee_id
+
+# 法1
+select project_id, employee_id 
+#或是  newtable.project_id as project_id, newtable.employee_id as employee_id 但太複雜
 from
 (select p.project_id, e.employee_id, # 不用 e.experience_years
-dense_rank over (partition by p.project_id order by e.experience_years desc) rnk
+dense_rank() over (partition by p.project_id order by e.experience_years desc) rnk
 from Project p
-left join Employee e ON p.employee_id = e.employee_id  # 或是 join project using(employee_id)
+left join Employee e ON p.employee_id = e.employee_id  # 或是 join project using(employee_id).see 法2
 ) as newtable
 where rnk = 1
 
 
-
+# 法2
 select project_id,employee_id from
 (
-select project_id,employee_id,dense_rank() over(partition by project_id order by experience_years DESC) as rk from employee join project using(employee_id)
+select project_id,employee_id,
+dense_rank() over(partition by project_id order by experience_years DESC) as rk 
+from employee join project using(employee_id)
 )as newtable
 where rk=1
 
 
 
 
-select t1.project_id,t1.employee_id
-from
-(select p.project_id, p.employee_id,
-dense_rank() over(partition by p.project_id order by e.experience_years desc) as rk
-from project p 
-left join employee e 
-on p.employee_id = e.employee_id) t1
-where t1.rk = 1;
