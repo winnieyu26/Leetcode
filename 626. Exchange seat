@@ -5,9 +5,6 @@ The column id is continuous increment.
 Mary wants to change seats for the adjacent students.
 
 Can you write a SQL query to output the result for Mary?
-
- 
-
 +---------+---------+
 |    id   | student |
 +---------+---------+
@@ -30,7 +27,7 @@ For the sample input, the output is:
 +---------+---------+
 Note:
 
-If the number of students is odd, there is no need to change the last one's seat.
+If the number of students is odd, no need to change the last one's seat.
 
 来源：力扣（LeetCode）
 链接：https://leetcode-cn.com/problems/exchange-seats
@@ -45,13 +42,14 @@ If the number of students is odd, there is no need to change the last one's seat
 # 法 １：查询id和student
 
 若id是偶数，减1 (往前一個)
-若id是奇数 兩種可能 --> 1. 加1 (id 往前一個)   
-                 --> 2. last low 不變
+若id是奇数 兩種可能 --> 加1 (id 往前一個)   
+                  -->  last row 不變  5+1 = 6  但是他是５ 
 问题在于当总数为奇数时，最后一个id应保持不变，加1会导致空出一位。
-解决此问题并不复杂：我们找到最后一位，让它保持不变就可以了。
+找到最后一位，不变就可以了。
 select 
     if(id%2=0, id-1,
-        if(id=(select count(distinct id) from seat),
+        if(id=(select count(distinct id) from seat),  --> 如果count出來表 總數是 5- odd 那最後的 id 一樣 5
+                                                      --> 如果count出來表 總數是 6- even 那最後的 5
             id, id+1)) 
     as id,
     student 
@@ -66,6 +64,7 @@ https://github.com/Fanlu91/FanluLeetcode
 # 所以用row_num把他連起來1,2,3,4,6 --> 1,2,3,4,5
 
 # if
+
 select row_number() over(
     order by (if(id % 2 = 0, id-1, id+1)
 ) as id,
@@ -74,6 +73,7 @@ from seat;
 -------------------------------------------------------------------------------
 
 # case when
+
 select row_number() over(
     order by (case when id % 2 = 0 then id-1 else id+1 end)
 ) as id,
@@ -82,6 +82,7 @@ from seat;
 -------------------------------------------------------------------------------
 
 #用 new table 
+
 with t as(
     select case when id % 2 = 0 then id-1 else id+1 end as id, student
     from seat 
