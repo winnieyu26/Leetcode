@@ -54,8 +54,10 @@ select b.book_id, name
 from books b 
 left join orders o
 on b.book_id = o.book_id and dispatch_date >= '2018-06-23' -- join （id 跟 一年前的） 
+ -- 对于‘去年销量’这个条件 如果有些书没在去年买 那么结果是0  而不是exclude掉
  -- reports the books that have sold in the last year 發貨日期dispatch date
-where available_from < '2019-05-23'
+ 
+where available_from < '2019-05-23' -- 不能放在join 因为 他不符合条件要exclude 但是join那些书会出现 如果ifnull变成0之后 他还是会算在符合条件里面
 group by b.book_id
 having sum(ifnull(quantity, 0)) < 10  --  less than 10 copies 但可能一年前沒有 就有null, 把他變成0 之後加起來sum
 
@@ -85,4 +87,3 @@ select book_id,name from
 right join books using(book_id)
 where ifnull(total,0)<10 and available_from<'2019-05-23'
 ;
-
