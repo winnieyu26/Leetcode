@@ -60,6 +60,9 @@ Both employees with id 1 and 3 have the most experience among the employees of t
 
 
 # Write your MySQL query statement below
+-- 先join 在排序 把它變成newtable 
+-- 之後取 select project_id, employee_id from newtable where rk = 1
+
 
 # 法1
 select project_id, employee_id 
