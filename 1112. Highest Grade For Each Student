@@ -1,0 +1,92 @@
+Table: Enrollments
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| student_id    | int     |
+| course_id     | int     |
+| grade         | int     |
++---------------+---------+
+(student_id, course_id) is the primary key of this table.
+
+Write a SQL query to find the highest grade with its corresponding course for each student. In case of a tie, you should find the course with the smallest course_id. The output must be sorted by increasing student_id.
+
+The query result format is in the following example:
+
+Enrollments table:
++------------+-------------------+
+| student_id | course_id | grade |
++------------+-----------+-------+
+| 2          | 2         | 95    |
+| 2          | 3         | 95    |
+| 1          | 1         | 90    |
+| 1          | 2         | 99    |
+| 3          | 1         | 80    |
+| 3          | 2         | 75    |
+| 3          | 3         | 82    |
++------------+-----------+-------+
+
+Result table:
++------------+-------------------+
+| student_id | course_id | grade |
++------------+-----------+-------+
+| 1          | 2         | 99    |
+| 2          | 2         | 95    |
+| 3          | 3         | 82    |
++------------+-----------+-------+
+
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/highest-grade-for-each-student
+
+
+# Write your MySQL query statement below
+
+-- highest grade with its corresponding course for each student
+-- smallest course_id.
+-- sorted by increasing student_id.
+-- 先選 max grade 在排 id 小到大 如果一樣選小的ｉｄ
+
+# 法 1
+select student_id, course_id, grade 
+from(
+#(select grade rank() over(partition by student_id order by course_id asc) as rnk  --> 是select * 所有東西 逗點 
+                                       -->    也要order by GRADE DESC,可以order by 兩種col
+    select *, rank() over(partition by student_id order by GRADE DESC, course_id asc) as rnk --> 才對
+            -- or row_number over()
+    from Enrollments) as newtable
+where rnk = 1
+-- 如果是row_number 後面要在 order by student_id
+
+# 法２
+第一步：获取每id最高成绩
+select student_id,max(grade) from Enrollments group by student_id
+第二步，（id,成绩）作为数组对应上述结果，可得对应的课程id
+where (student_id,grade) in (第一步代码)
+第三步，打平的情况，通过select min(course_id)解决即可。
+
+
+select student_id,min(course_id) as course_id,grade
+from Enrollments
+where (student_id,grade) in 
+    (select student_id,max(grade) from Enrollments 
+    group by student_id)
+group by student_id, grade
+
+
+
+# rank
+SELECT STUDENT_ID, COURSE_ID, GRADE
+FROM (SELECT *, RANK() OVER(PARTITION BY STUDENT_ID ORDER BY GRADE DESC, COURSE_ID) AS `RANK`
+      FROM ENROLLMENTS) AS newtable
+WHERE `RANK` = 1;
+
+
+# row_num
+select student_id,course_id,grade
+from
+    (select *,row_number() over(partition by student_id order by grade desc,course_id) as rownum
+    from enrollments        
+    )t1
+where rownum=1
+order by student_id
