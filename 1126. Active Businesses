@@ -1,0 +1,82 @@
+Table: Events
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| business_id   | int     |
+| event_type    | varchar |
+| occurences    | int     | 
++---------------+---------+
+(business_id, event_type) is the primary key of this table.
+Each row in the table logs the info that an event of some type occurred at some business for a number of times.
+ 
+
+The average activity for a particular event_type is the average occurences across all companies that have this event.
+
+An active business is a business that has more than one event_type such that their occurences is strictly greater than the average activity for that event.
+
+Write an SQL query to find all active businesses.
+
+The query result format is in the following example:
+
+ 
+
+Events table:
++-------------+------------+------------+
+| business_id | event_type | occurences |
++-------------+------------+------------+
+| 1           | reviews    | 7          |
+| 3           | reviews    | 3          |
+| 1           | ads        | 11         |
+| 2           | ads        | 7          |
+| 3           | ads        | 6          |
+| 1           | page views | 3          |
+| 2           | page views | 12         |
++-------------+------------+------------+
+
+Result table:
++-------------+
+| business_id |
++-------------+
+| 1           |
++-------------+ 
+The average activity for each event can be calculated as follows:
+- 'reviews': (7+3)/2 = 5
+- 'ads': (11+7+6)/3 = 8
+- 'page views': (3+12)/2 = 7.5
+The business with id=1 has 7 'reviews' events (more than 5) and 11 'ads' events (more than 8), so it is an active business.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/active-businesses
+
+
++------------+------------+------------+------------+------------+------------+------------+------------
+
+# Write your MySQL query statement below
+
+-- 解题思路
+1. USE WINDOW FUNCTION AVG TO GET THE AVERAGE OCCURENCE BY EVENT;
+2. USE GROUP BY AND HAVING TO GET COMPANY WITH MORE THAN 1 EVENT HAS HIGHER THAN AVERAGE OCCURENCE BY EVENT;
+
+# ME
+select business_id from 
+    (select *, AVG() over (partition by event_type) as avg_r from Events) as avg_activity --> avg_activity 是 看event_type而已 跟id沒關
+where occurences > avg_activity
+group by business_id --> 不是 partition by business_id, 可以直接選OCCURENCES 因為 window function 只是window function裡面 多+ 1列
+having COUNT(event_type) > 1;
+# 或是 having COUNT(*) >1 可以
+
+
+#拿到平均值后使用 JOIN 将新的数据和老数据根据 event_type 联合在一起。
+# 判断老数据的 occurences 是否大于avg。
+
+
+SELECT business_id
+FROM Events AS e
+JOIN (
+    SELECT event_type, AVG(occurences) AS eventAvg
+    FROM Events
+    GROUP BY event_type
+    ) AS newtable 
+ON e.event_type = newtable.event_type
+WHERE e.occurences > newtable.eventAvg
