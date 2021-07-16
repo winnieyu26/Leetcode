@@ -1,0 +1,104 @@
+Table: Traffic
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| user_id       | int     |
+| activity      | enum    |
+| activity_date | date    |
++---------------+---------+
+There is no primary key for this table, it may have duplicate rows.
+The activity column is an ENUM type of ('login', 'logout', 'jobs', 'groups', 'homepage').
+ 
+
+Write an SQL query that reports for every date within at most 90 days from today, the number of users that logged in for the first time on that date. Assume today is 2019-06-30.
+
+The query result format is in the following example:
+
+Traffic table:
++---------+----------+---------------+
+| user_id | activity | activity_date |
++---------+----------+---------------+
+| 1       | login    | 2019-05-01    |
+| 1       | homepage | 2019-05-01    |
+| 1       | logout   | 2019-05-01    |
+| 2       | login    | 2019-06-21    |
+| 2       | logout   | 2019-06-21    |
+| 3       | login    | 2019-01-01    |
+| 3       | jobs     | 2019-01-01    |
+| 3       | logout   | 2019-01-01    |
+| 4       | login    | 2019-06-21    |
+| 4       | groups   | 2019-06-21    |
+| 4       | logout   | 2019-06-21    |
+| 5       | login    | 2019-03-01    |
+| 5       | logout   | 2019-03-01    |
+| 5       | login    | 2019-06-21    |
+| 5       | logout   | 2019-06-21    |
++---------+----------+---------------+
+
+Result table:
++------------+-------------+
+| login_date | user_count  |
++------------+-------------+
+| 2019-05-01 | 1           |
+| 2019-06-21 | 2           |
++------------+-------------+
+Note that we only care about dates with non zero user count.
+The user with id 5 first logged in on 2019-03-01 so he's not counted on 2019-06-21.
+
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/new-users-daily-count
+
++---------+----------+---------------++---------+----------+---------------++---------+----------+---------------++---------+
+
+# Write your MySQL query statement below
+
+# 法1
+
+# where + group by + count(具体字段)
+# 先选出login的记录，再分组选出mindate，再having筛选出90天内的记录
+
+select login_date, count(user_id) as user_count
+from
+(select user_id, activity, min(activity_date) as login_date
+    from Traffic
+    where activity = 'login'
+    group by user_id
+    having datediff('2019-06-30',login_date) <= 90
+) a
+group by login_date
+
++---------+----------+---------------++---------+----------+---------------++---------+----------+---------------++---------+
+
+# ME
+select min_date as login_date, count(user_id) as user_count 
+from 
+(   #select min(activity_date) as login_date,  --> select user_id 才能分組 ＋ min(activity_date) as mindate
+    #count(distinct user_id) as user_count  --> 不用數 要先把條件先選出來 
+-- 改成 
+    select user_id, activity, min(activity_date) as min_date  
+    from Traffic
+    where activity = 'login'
+    group by user_id --> 先where 在group by 選id以他為分組 (忘記group by)
+    having datediff('2019-06-30', min_date <= 90) -->'2019-06-30' 要有引號
+ ) as t  
+group by login_date 
+
++---------+----------+---------------++---------+----------+---------------++---------+----------+---------------++---------+
+
+# 法2
+1. USE GROUP BY AND MIN TO GET THE FIRST LOGIN DATE;
+2. WHERE ACTIVITY IS LOGIN;
+3. USE GROUP BY AND COUNT TO GET THE NUMBER OF USERS;
+4. USE DATEDIFF TO GET DATE WITHIN 90 DAYS;
+
+SELECT ACTIVITY_DATE AS LOGIN_DATE, COUNT(*) AS USER_COUNT
+FROM (SELECT USER_ID, MIN(ACTIVITY_DATE) AS ACTIVITY_DATE
+      FROM TRAFFIC
+      WHERE ACTIVITY = 'login'
+      GROUP BY USER_ID) AS A
+WHERE DATEDIFF('2019-06-30', ACTIVITY_DATE) <= 90
+GROUP BY LOGIN_DATE;
+
+
