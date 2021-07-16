@@ -47,7 +47,8 @@ Result table:
 
 SELECT DISTINCT viewer_id AS id
 from Views 
-group by viewer_id, view_date           --> 記得group by view_date 
+group by viewer_id, view_date  --> 記得group by view_date
+              -- 使用时间来聚合: 这一天有多少人读了多少书，
+              -- 加上viewer_id，一个人一天读了多少书
 having count(distinct article_id) > 1
 order by viewer_id
-
