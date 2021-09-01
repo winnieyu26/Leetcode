@@ -1,0 +1,83 @@
+Table: Person
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| PersonId    | int     |
+| FirstName   | varchar |
+| LastName    | varchar |
++-------------+---------+
+PersonId is the primary key column for this table.
+Table: Address
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| AddressId   | int     |
+| PersonId    | int     |
+| City        | varchar |
+| State       | varchar |
++-------------+---------+
+AddressId is the primary key column for this table.
+ 
+Write a SQL query for a report that provides the following information for each person in the Person table, regardless if there is an address for each of those people:
+FirstName, LastName, City, State
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/combine-two-tables
+
++-------------+---------++-------------+---------++-------------+---------++-------------+---------++-------------+---------+
+# Write your MySQL query statement below
+法1 ：合併 left join 要保留學生 “each person" 左表 “ON”
+
+Select FirstName, LastName, City, State 
+From Person p 
+left join Address a on p.PersonId = a.PersonId
+
+法2：合併 left join 要保留學生 “each person" 左表 “ＵＳＩＮＧ”
+USING会去掉重复列，ON显示重复列。也就是说，当两个表的关联字段名是相同的，使用USING会更简洁，反之使用ON会更清晰明了
+
+SELECT FirstName, LastName, City, State
+FROM Person
+LEFT JOIN Address
+USING(PersonId)
+
+
+作者：melvin0987
+链接：https://leetcode-cn.com/problems/combine-two-tables/solution/duo-biao-lian-jie-shi-usinghe-onde-qu-bi-hx1m/
+来源：力扣（LeetCode）
+
+解题思路
+1.确定查询结果
+
+题目要求查询所有学生的姓名，学号，课程和成绩信息
+select 学号,姓名,课程,成绩
+查询结果的列名“学号”、“姓名”，在“学生”表里，列名“课程”、“成绩”在“成绩”表里，所以需要进行多表查询。
+
+2.哪种联结呢？
+涉及到多表查询，在之前的课程《从零学会sql：多表查询》里讲过需要用到联结。
+多表的联结又分为以下几种类型：
+
+1）左联结（left join），联结结果保留左表的全部数据
+2）右联结（right join），联结结果保留右表的全部数据
+3）内联结（inner join），取两表的公共数据
+
+这个题目里要求“所有学生”，而“所有学生”在“学生”表里。为什么不在“成绩”表里呢？
+
+如果有的学生没有选修课程，那么他就不会出现在“成绩”表里，所以“成绩”表没有包含“所有学生”。
+
+所以要以“学生”表进行左联结，保留左边表（学生表）里的全部数据。
+
+from 学生信息表 as a left join 成绩表 as b
+
+3.两个表联结条件是什么？
+
+两个表都有“学号”，所以联结条件为学号。
+
+on a.学号=b.学号
+
+4.最终sql
+
+作者：houzidata
+链接：https://leetcode-cn.com/problems/combine-two-tables/solution/tu-jie-sqlmian-shi-ti-duo-biao-ru-he-cha-xun-by-ho/
+来源：力扣（LeetCode）
