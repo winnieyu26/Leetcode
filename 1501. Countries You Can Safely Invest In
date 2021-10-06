@@ -1,0 +1,92 @@
+# Leetcode
+
+A telecommunications company wants to invest in new countries. The company intends to invest in the countries where the average call duration of the calls in this country is strictly greater than the global average call duration.
+
+Write an SQL query to find the countries where this company can invest.
+
+Return the result table in any order.
+
+The query result format is in the following example:
+
+ 
+
+Person table:
++----+----------+--------------+
+| id | name     | phone_number |
++----+----------+--------------+
+| 3  | Jonathan | 051-1234567  |
+| 12 | Elvis    | 051-7654321  |
+| 1  | Moncef   | 212-1234567  |
+| 2  | Maroua   | 212-6523651  |
+| 7  | Meir     | 972-1234567  |
+| 9  | Rachel   | 972-0011100  |
++----+----------+--------------+
+
+Country table:
++----------+--------------+
+| name     | country_code |
++----------+--------------+
+| Peru     | 051          |
+| Israel   | 972          |
+| Morocco  | 212          |
+| Germany  | 049          |
+| Ethiopia | 251          |
++----------+--------------+
+
+Calls table:
++-----------+-----------+----------+
+| caller_id | callee_id | duration |
++-----------+-----------+----------+
+| 1         | 9         | 33       |
+| 2         | 9         | 4        |
+| 1         | 2         | 59       |
+| 3         | 12        | 102      |
+| 3         | 12        | 330      |
+| 12        | 3         | 5        |
+| 7         | 9         | 13       |
+| 7         | 1         | 3        |
+| 9         | 7         | 1        |
+| 1         | 7         | 7        |
++-----------+-----------+----------+
+
+Result table:
++----------+
+| country  |
++----------+
+| Peru     |
++----------+
+The average call duration for Peru is (102 + 102 + 330 + 330 + 5 + 5) / 6 = 145.666667
+The average call duration for Israel is (33 + 4 + 13 + 13 + 3 + 1 + 1 + 7) / 8 = 9.37500
+The average call duration for Morocco is (33 + 4 + 59 + 59 + 3 + 7) / 6 = 27.5000 
+Global call duration average = (2 * (33 + 4 + 59 + 102 + 330 + 5 + 13 + 3 + 1 + 7)) / 20 = 55.70000
+Since Peru is the only country where average call duration is greater than the global average, it's the only recommended country.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/countries-you-can-safely-invest-in
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+-----------+-----------+----------+-----------+-----------+----------+-----------+-----------+----------+-----------+-----------
+# Write your MySQL query statement below
+
+#average call duration of the calls in this country is strictly greater than the global average call duration
+
+# caller 跟 callee 合併 id
+with t as (
+    select * from Calls 
+    union all
+    select callee_id, caller_id, duration from Calls)
+
+select name as country # result: country 就只要select 那一行就好
+from(
+    select c.name, duration
+    from Person p, Country c, t
+    where left(phone_number, 3) = country_code AND
+    p.id = t.caller_id) t2  #3 table合併 用where 條件1 AND 條件2 連接
+    group by name 
+    having avg(duration) > # country
+            (select avg(duration) #global
+            from calls )
+
+# 記得having avg 不能直接 > having
+ #  要大於table 裡的 avg
+
