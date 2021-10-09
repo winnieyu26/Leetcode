@@ -1,0 +1,81 @@
+Table: Championships
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| year          | int     |
+| Wimbledon     | int     |
+| Fr_open       | int     |
+| US_open       | int     |
+| Au_open       | int     |
++---------------+---------+
+year is the primary key for this table.
+Each row of this table containts the IDs of the players who won one each tennis tournament of the grand slam.
+ 
+
+Write an SQL query to report the number of grand slam tournaments won by each player. Do not include the players who did not win any tournament.
+
+Return the result table in any order.
+
+The query result format is in the following example:
+
+ 
+
+Players table:
++-----------+-------------+
+| player_id | player_name |
++-----------+-------------+
+| 1         | Nadal       |
+| 2         | Federer     |
+| 3         | Novak       |
++-----------+-------------+
+
+Championships table:
++------+-----------+---------+---------+---------+
+| year | Wimbledon | Fr_open | US_open | Au_open |
++------+-----------+---------+---------+---------+
+| 2018 | 1         | 1       | 1       | 1       |
+| 2019 | 1         | 1       | 2       | 2       |
+| 2020 | 2         | 1       | 2       | 2       |
++------+-----------+---------+---------+---------+
+
+Result table:
++-----------+-------------+-------------------+
+| player_id | player_name | grand_slams_count |
++-----------+-------------+-------------------+
+| 2         | Federer     | 5                 |
+| 1         | Nadal       | 7                 |
++-----------+-------------+-------------------+
+
+Player 1 (Nadal) won 7 titles: Wimbledon (2018, 2019), Fr_open (2018, 2019, 2020), US_open (2018), and Au_open (2018).
+Player 2 (Federer) won 5 titles: Wimbledon (2020), US_open (2019, 2020), and Au_open (2019, 2020).
+Player 3 (Novak) did not win anything, we did not include them in the result table.
+
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/grand-slam-titles
+
+
++------+-----------+---------+---------+---------+------+-----------+---------+---------+---------+
+# Write your MySQL query statement below
+
+#  won by each player. Do not include the players who did not win any tournament.
+
+1. 把名字改成id  因為 Championship 表中的 1, 2 是 PLAYER ID 1,2 
+2. UNION ALL 分別取出 不同的ＩＤ (所以可以用它來分組 知道各個ＩＤ 拿多少獎牌）
+3. ＩＮＮＥＲ ＪＯＩＮ 或是 ＬＥＦＴ ＪＯＩＮ都可以 --> 用Player_id 來 JOIN
+
+
+SELECT p.player_id, player_name, COUNT(t.player_id) as grand_slams_count
+FROM 
+(SELECT Wimbledon as player_id from Championships
+UNION ALL
+SELECT Fr_open as player_id from Championships
+UNION ALL
+SELECT US_open as player_id from Championships
+UNION ALL
+SELECT Au_open as player_id from Championships) t 
+INNER JOIN Players p ON t.player_id = p.player_id 
+GROUP BY player_id 
+#Having COUNT(t.player_id)>0  # 可有可無 INNER JOIN 沒有NULL 可以不用數
+
