@@ -1,0 +1,7 @@
+１． 兩表  ＬＥＦＴ ＪＯＩＮ的時候  右表沒有配到的會變成 ＮＵＬＬ 
+２． 所以要用 ＩＦＮＵＬＬ（＿, 0） --> 把ＮＵＬＬ 變0才能求和
+３． 可以直接 SUM(IFNULL)
+
+select SUM(b.apple_count)+ SUM(IFNULL(c.apple_count,0)) apple_count,
+ SUM(b.orange_count)+ SUM(IFNULL(c.orange_count,0)) orange_count
+from Boxes b LEFT JOIN Chests c ON b.chest_id = c.chest_id
