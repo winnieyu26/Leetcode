@@ -1,0 +1,3 @@
+兩台電腦同時登入 ＝ 第二次登入在Ｌ1 使用期間:
+
+1747.  L2.login BETWEEN L1.login AND L1.logout
