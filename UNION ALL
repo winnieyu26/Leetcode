@@ -1,0 +1,38 @@
+Q 1783.
+1. 每個 UNION ALL 都要是 從ＳＥＬＥＣＴ ＦＲＯＭ 
+ｃｏｌ 要是同一個名字就會連一起
+
+select __ as "改名成一樣", __,  __ from __ （不要逗點）
+ＵＮＩＯＮ ＡＬＬ
+select __ as 改名成一樣, __,  __ from __ （不要逗點）
+ＵＮＩＯＮ ＡＬＬ
+select __ as 改名成一樣, __,  __ from __ （不要逗點）
+
+
+
+Players table:
++-----------+-------------+
+| player_id | player_name |
++-----------+-------------+
+| 1         | Nadal       |
+| 2         | Federer     |
+| 3         | Novak       |
++-----------+-------------+
+
+Championships table:
++------+-----------+---------+---------+---------+
+| year | Wimbledon | Fr_open | US_open | Au_open |
++------+-----------+---------+---------+---------+
+| 2018 | 1         | 1       | 1       | 1       |
+| 2019 | 1         | 1       | 2       | 2       |
+| 2020 | 2         | 1       | 2       | 2       |
++------+-----------+---------+---------+---------+
+
+(SELECT Wimbledon as player_id from Championships
+UNION ALL
+SELECT Fr_open as player_id from Championships
+UNION ALL
+SELECT US_open as player_id from Championships
+UNION ALL
+SELECT Au_open as player_id from Championships) t 
+
