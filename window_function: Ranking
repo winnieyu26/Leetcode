@@ -9,6 +9,12 @@ Select sales_id, sales_total,
       DENSE_RANK() OVER(order by 甲sales_total desc) as dense     --> 1,1,2,  前兩個並排的就算1個 後面是第2名
       NTULE(3) OVER(order by 甲sales_total desc) as ntle        --> IN NTLE ranking "3" is the biggest number, 記得( )裡面有數
 from table_name
+      MAX(amount) over (partition by date(day) order by amount desc) max_amount
+
+作者：sylvia-ok
+链接：https://leetcode-cn.com/problems/maximum-transaction-each-day/solution/datehan-shu-he-max-over-by-sylvia-ok-sluf/
+
+
 
 	sales_id    sales_total      rownum     rnk    dense	ntle
 1	3	        84	         1	 1	1	 1
@@ -24,3 +30,33 @@ NTULE(數字) = assign tile numbers based on number of tile requested
 
 
 YT Tutorial for other window function: https://www.youtube.com/watch?v=H6OTMoXjNiM
+
+
+# 小心 不能直接partition by day, 要換成 DATE(day)
+# WHERE rnk =1 不能放在 RANK from table, 是額外提出來
+# Write your MySQL query statement below
+
+# 小心 不能直接partition by day, 要換成 DATE(day)
+# WHERE rnk =1 不能放在 RANK from table, 是額外提出來
+
+WITH t as (SELECT transaction_id, 
+RANK() OVER(PARTITION BY DATE(day) ORDER BY amount desc) rnk
+FROM Transactions) 
+
+SELECT transaction_id FROM t
+WHERE rnk = 1
+ORDER BY transaction_id
+
+
+# Write your MySQL query statement below
+WITH t AS(
+    SELECT *, MAX(amount) OVER (
+        PARTITION BY DATE(day)
+    ) max_amount
+    FROM Transactions 
+)
+
+SELECT transaction_id FROM t 
+WHERE amount = max_amount 
+ORDER BY transaction_id
+
