@@ -1,0 +1,17 @@
+3 個條件 要用 ＣＡＳＥ  ＷＨＥＮ
+
+寫法：
+CASE WHEN (條件1) THEN（結果1)  不用逗號！
+    WHEN (條件2) THEN (結果2)   不用逗號！
+    ESLE 結果３
+    END  table名
+    
+Ｑ 1841.
+# home_team_goals > away_team_goals --> 3分
+# home_team_goals = away_team_goals --> 各1分
+# home_team_goals < away_team_goals --> 0分
+
+SUM(CASE WHEN home_team_goals > away_team_goals THEN 3
+    WHEN home_team_goals = away_team_goals THEN 1
+    ELSE 0 END) points
+    
