@@ -3,3 +3,35 @@
 LEAD(visit_date, 1, '2021-1-1') OVER (
     PARTITION BY user_id
     ORDER BY visit_Date) next_visit
+
+
++----+------------++----+------------+
+# Write your MySQL query statement below
+
+# 隔天 想到 LEAD() 寫下一天的 col 
+# 用 DATEDIFF() 去掉
+
+WITH t as(
+select *,
+LEAD(login_date, 4) OVER(Partition BY id ORDER BY login_date ) nxt_login,
+# LEAD(__,4) 代表第五行往上移到下一個col
+DATEDIFF(LEAD(login_date,4) OVER(Partition BY id ORDER BY login_date),
+# DATEDIFF (__, __) as diff 在下面表可以選 
+        login_date) AS diff
+FROM Logins
+Group by id, login_date)  
+# group by id跟 login_date 要去重複 因為有人同id 同一天登入
+
+select t.id, name
+FROM Accounts a 
+LEFT JOIN t 
+ON a.id = t.id
+where diff = 4   # 1/1, 1/2,.. 1/5 五天裡 = 1/5 - 1/1 = 4 所以這裡是4 
+ORDER BY id
+
+
+
+
+
+
+
