@@ -37,9 +37,24 @@ Result table:
 
 来源：力扣（LeetCode）
 链接：https://leetcode-cn.com/problems/unpopular-books
++-----------+--------------------++-----------+--------------------++-----------+--------------------+
 
+# Write your MySQL query statement below
+With t as(
+Select *
+From Books 
+Where available_from NOT between '2019-05-24' and '2019-06-23')
 
-+-----------+--------------------++-----------+--------------------++-----------+----------
+Select t.book_id, name   
+From t 
+Left Join Orders o   #用left join 會有NULL --> 記得把它變成 0 
+                        # 不能 Inner Join 因為還是算要合起來0的
+ON t.book_id = o.book_id and
+dispatch_date > '2018-06-23'
+Group by book_id
+Having SUM(ifnull(quantity,0)) < 10  #IFNULL 記得要 再sum裡面！
+
++-----------+--------------------++-----------+--------------------++-----------+--------------------+
 # Write your MySQL query statement below
 
 思考点主要是left join的使用以及on和where的辨析
@@ -62,7 +77,7 @@ where available_from < '2019-05-23'  -- 要刪掉的 用where
 group by b.book_id
 having sum(ifnull(quantity, 0)) < 10  --  less than 10 copies 但可能一年前沒有 就有null, 把他變成0 之後加起來sum
 
-
++-----------+--------------------++-----------+--------------------++-----------+--------------------+
 Q:两个日期限制何时进行处理的问题，如果我们过早的对“一个月”进行删除是无效的。
 我们在统计“一年内”销量的时候因为要考虑0销量而没有出现在2018-6-23之后的产品，也就是null的情况，
 想到 out join 来进行缺失产品信息的补足，这个时候就会又把早先的“一个月”条目补充回来。
