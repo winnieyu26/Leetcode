@@ -1,0 +1,62 @@
+Write an SQL query to find the npv of all each query of queries table.
+
+Return the result table in any order.
+
+The query result format is in the following example:
+
+NPV table:
++------+--------+--------+
+| id   | year   | npv    |
++------+--------+--------+
+| 1    | 2018   | 100    |
+| 7    | 2020   | 30     |
+| 13   | 2019   | 40     |
+| 1    | 2019   | 113    |
+| 2    | 2008   | 121    |
+| 3    | 2009   | 12     |
+| 11   | 2020   | 99     |
+| 7    | 2019   | 0      |
++------+--------+--------+
+
+Queries table:
++------+--------+
+| id   | year   |
++------+--------+
+| 1    | 2019   |
+| 2    | 2008   |
+| 3    | 2009   |
+| 7    | 2018   |
+| 7    | 2019   |
+| 7    | 2020   |
+| 13   | 2019   |
++------+--------+
+
+Result table:
++------+--------+--------+
+| id   | year   | npv    |
++------+--------+--------+
+| 1    | 2019   | 113    |
+| 2    | 2008   | 121    |
+| 3    | 2009   | 12     |
+| 7    | 2018   | 0      |
+| 7    | 2019   | 0      |
+| 7    | 2020   | 30     |
+| 13   | 2019   | 40     |
++------+--------+--------+
+
+The npv value of (7, 2018) is not present in the NPV table, we consider it 0.
+The npv values of all other queries can be found in the NPV table.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/npv-queries
++------+--------+--------++------+--------+--------++------+--------+--------+
+
+# Write your MySQL query statement below
+
+select q.id, q.year, IFNULL(npv,0) as npv  #這裡不用sum
+FROM Queries q 
+LEFT JOIN NPV n  
+ON n.id = q.id 
+AND n.year = q.year 
+
+# 如果反過來會有 NULL value 在Q有的 但n沒有，所以是取q為主的id 跟 LEFT JOIN 左右順序不能亂
