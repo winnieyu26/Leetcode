@@ -1,0 +1,10 @@
+
+# Q1193
+select Left(trans_date,7) as month,
+country,
+count(trans_date) trans_count, 
+SUM(IF(state = 'approved',1,0)) approved_count,   ***這行 要算approve 記得用ＳＵＭ（ＩＦ（
+SUM(amount) trans_total_amount,
+SUM(IF(state = 'approved',amount, 0)) approved_total_amount  ***這行 要算approve 記得用ＳＵＭ（ＩＦ（
+FROM Transactions
+GROUP BY month, country
