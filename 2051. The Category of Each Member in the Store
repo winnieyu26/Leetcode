@@ -72,19 +72,18 @@ Explanation:
 
 WITH t AS (
 SELECT m.member_id, m.name,
-100 * COUNT(DISTINCT p.visit_id) / COUNT(DISTINCT v.visit_id) conversion
+100 * COUNT(p.visit_id) # Purchase table裡面隨便什麼col都可以
+/ COUNT(v.visit_id) conversion # Visitor table裡面隨便什麼col都可以
 FROM Members m LEFT JOIN Visits v
 ON m.member_id = v.member_id 
 LEFT JOIN Purchases p 
 ON v.visit_id = p.visit_id 
-GROUP BY m.member_id
-)
+GROUP BY m.member_id         # 有aggregation 一般都要 group by 因為要根據什麼 count, sum 不然就是count 所有table了
+) 
 
 SELECT member_id, name,
 CASE WHEN conversion >= 80 THEN 'Diamond'
 WHEN conversion >= 50 THEN 'Gold' 
 WHEN conversion < 50 THEN 'Silver'
-ELSE 'Bronze' END category
+ELSE 'Bronze' END as category  # 記得要取名 category
 FROM t
-ORDER BY member_id;
-
