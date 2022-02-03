@@ -55,7 +55,6 @@ The user with id 5 first logged in on 2019-03-01 so he's not counted on 2019-06-
 # Write your MySQL query statement below
 
 # 法1
-
 # where + group by + count(具体字段)
 # 先选出login的记录，再分组选出mindate，再having筛选出90天内的记录
 
