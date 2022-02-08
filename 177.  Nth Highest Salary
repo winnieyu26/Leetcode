@@ -1,4 +1,6 @@
-
+ IFNULL (column_name, value_to_replace) 
+ 
+ 
 Write a SQL query to get the nth highest salary from the Employee table.
 
 +----+--------+
