@@ -53,7 +53,7 @@ LIMIT 1 OFFSET 1
 SELECT MAX(Salary) SecondHighestSalary
 FROM Employee
 WHERE Salary <> (SELECT MAX(Salary) FROM Employee)
-解决方案 (1)：子查询 + 分页思想；解决方案 (2)：IFNULL 函数；解决方案 (3)：骚操作~
+
 SQL查询语句中的 limit 与 offset 的区别
 
 limit y 分句表示: 读取 y 条数据
@@ -64,4 +64,4 @@ limit n 等价于 limit 0,n
 作者：lux-sun
 链接：https://leetcode-cn.com/problems/second-highest-salary/solution/jie-ti-176-di-er-gao-de-xin-shui-by-lux-025oo/
 来源：力扣（LeetCode）
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
