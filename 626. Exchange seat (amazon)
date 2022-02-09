@@ -1,9 +1,6 @@
 Mary is a teacher in a middle school and she has a table seat storing students' names and their corresponding seat ids.
-
 The column id is continuous increment.
-
 Mary wants to change seats for the adjacent students.
-
 Can you write a SQL query to output the result for Mary?
 +---------+---------+
 |    id   | student |
@@ -14,8 +11,8 @@ Can you write a SQL query to output the result for Mary?
 |    4    | Green   |
 |    5    | Jeames  |
 +---------+---------+
-For the sample input, the output is:
 
+For the sample input, the output is:
 +---------+---------+
 |    id   | student |
 +---------+---------+
@@ -48,8 +45,8 @@ If the number of students is odd, no need to change the last one's seat.
 找到最后一位，不变就可以了。
 select 
     if(id%2=0, id-1,
-        if(id=(select count(distinct id) from seat),  --> 如果count出來表 總數是 5- odd 那最後的 id 一樣 5
-                                                      --> 如果count出來表 總數是 6- even 那最後的 5
+        if(id=(select count(distinct id) from seat),  --> 如果count出來表 總數是 5, odd,  那最後的 id 一樣 5
+                                                      --> 如果count出來表 總數是 6, even, 那最後的 5
             id, id+1)) 
     as id,
     student 
