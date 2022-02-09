@@ -38,6 +38,20 @@ and a.free=1
 and b.free=1
 order by a.seat_id
 
+------ self join 兩個一樣的表格 a, b ------
+用 ab(X-Y) = 1 代表連續
+
+select distinct a.seat_id
+from cinema as a, cinema as b
+  where abs(a.seat_id - b.seat_id) = 1
+  and a.free = 1 and b.free = 1
+order by a.seat_id
+
+作者：erke
+链接：https://leetcode-cn.com/problems/consecutive-available-seats/solution/where-absaseat_id-bseat_id-1-and-afree-1-cbvt/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
 ------ LAG 兩個一樣的表格 a, b ------
 SELECT SEAT_ID
 FROM (SELECT *, LAG(FREE, 1) OVER(ORDER BY SEAT_ID) AS L1, LEAD(FREE, 1) OVER(ORDER BY SEAT_ID) AS L2
