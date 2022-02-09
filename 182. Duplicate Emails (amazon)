@@ -30,6 +30,18 @@ having count(Email) > 1
 
 -- 解法1
 select email from person group by email having count(email)>1
+# Write your MySQL query statement below
+
+select Email
+from Person 
+group by Email
+having count(Email)>=2
+
+| Email   | num |
+|---------|-----|
+| a@b.com | 2   |
+| c@d.com | 1   |
+
 
 --解法2
 select email from (
