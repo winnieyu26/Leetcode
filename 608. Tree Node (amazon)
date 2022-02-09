@@ -1,0 +1,81 @@
+# Write your MySQL query statement below
+Each node in the tree can be one of three types:
+
+"Leaf": if the node is a leaf node.
+"Root": if the node is the root of the tree.
+"Inner": If the node is neither a leaf node nor a root node.
+Write an SQL query to report the type of each node in the tree.
+
+Return the result table ordered by id in ascending order.
+
+The query result format is in the following example.
+
+ 
+
+Example 1:
+
+
+Input: 
+Tree table:
++----+------+
+| id | p_id |
++----+------+
+| 1  | null |
+| 2  | 1    |
+| 3  | 1    |
+| 4  | 2    |
+| 5  | 2    |
++----+------+
+Output: 
++----+-------+
+| id | type  |
++----+-------+
+| 1  | Root  |
+| 2  | Inner |
+| 3  | Leaf  |
+| 4  | Leaf  |
+| 5  | Leaf  |
++----+-------+
+Explanation: 
+Node 1 is the root node because its parent node is null and it has child nodes 2 and 3.
+Node 2 is an inner node because it has parent node 1 and child node 4 and 5.
+Nodes 3, 4, and 5 are leaf nodes because they have parent nodes and they do not have child nodes.
+Example 2:
+
+
+Input: 
+Tree table:
++----+------+
+| id | p_id |
++----+------+
+| 1  | null |
++----+------+
+Output: 
++----+-------+
+| id | type  |
++----+-------+
+| 1  | Root  |
++----+-------+
+Explanation: If there is only one node on the tree, you only need to output its root attributes.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/tree-node
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+SELECT id,
+(CASE 
+WHEN p_id IS Null THEN 'Root' # 條件1
+WHEN id IN (SELECT p_id FROM Tree WHERE p_id IS NOT NULL) THEN 'Inner'
+  #如果 id 出现在 p_id 里面 就代表该点上下都有节点，因为所有的根节点都已经找到了。
+    ELSE 'Leaf'
+    END ) AS Type
+FROM Tree 
+
+
+A not in B的原理是拿A表值与B表值做是否不等的比较, a != b. 
+null是 缺失未知值 而不是空值
+
+当你判断任意值a != null时, 官方说, "You cannot use arithmetic comparison operators such as =, <, or <> to test for NULL", 任何与null值的对比都将返回null. 因此返回结果为否,这点可以用代码 select if(1 = null, 'true', 'false')证实.
+
+id not in (select p_id from tree)时, 因为p_id有null值, 返回结果全为false, 
+跳到else的结果, 返回值为inner. 所以在答案中,leaf结果从未彰显,全被inner取代.
