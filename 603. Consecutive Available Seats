@@ -24,33 +24,22 @@ Consecutive available seats are more than 2(inclusive) seats consecutively avail
 
 来源：力扣（LeetCode）
 链接：https://leetcode-cn.com/problems/consecutive-available-seats
+# Write your MySQL query statement below
 
 ------ self join 兩個一樣的表格 a, b ------
 1. 創 cinema table a, b
 2. 當 a 的 seat_id 後面的位子是 b 或是 b後面是a 
 3. a 是free, b也是free 就是連續2
-4. join後 是 order by a 的id
+4. join後 order by a 的id
 
-# Write your MySQL query statement below
-select distinct a.seat_id from cinema a ,cinema b
-where (a.seat_id+1=b.seat_id or b.seat_id+1=a.seat_id)
-and a.free=1
-and b.free=1
-order by a.seat_id
+SELECT DISTINCT c1.seat_id
+FROM Cinema c1, Cinema c2
+WHERE abs(c1.seat_id - c2.seat_id) = 1
+#ＯＲ: WHERE (c1.seat_id = c2.seat_id + 1 OR c1.seat_id = c2.seat_id - 1)
+AND c1.free = 1 AND  c2.free = 1
+ORDER BY c1.seat_id
 
------- self join 兩個一樣的表格 a, b ------
-用 ab(X-Y) = 1 代表連續
 
-select distinct a.seat_id
-from cinema as a, cinema as b
-  where abs(a.seat_id - b.seat_id) = 1
-  and a.free = 1 and b.free = 1
-order by a.seat_id
-
-作者：erke
-链接：https://leetcode-cn.com/problems/consecutive-available-seats/solution/where-absaseat_id-bseat_id-1-and-afree-1-cbvt/
-来源：力扣（LeetCode）
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 ------ LAG 兩個一樣的表格 a, b ------
 SELECT SEAT_ID
@@ -70,6 +59,8 @@ LEAD(＿＿＿,1) OVER (PARTITION BY 同一組客戶
                     ORDER BY 日期, 座位 ) AS 後一格 NextValue（自己命名）
    
                     
+
+
                     
                     
                     
