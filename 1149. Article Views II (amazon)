@@ -42,9 +42,18 @@ Result table:
 来源：力扣（LeetCode）
 链接：https://leetcode-cn.com/problems/article-views-ii
 
-
+# 法１
 # Write your MySQL query statement below
 
+SELECT DISTINCT v1.viewer_id as id  # 沒有distinct會: id = 5,5,6,6
+FROM Views v1, Views v2
+WHERE v1.viewer_id = v2.viewer_id
+AND v1.view_date = v2.view_date
+AND v1.article_id <> v2.article_id
+ORDER BY id				# 記得排序: id = 5,6
+
+
+# 法２
 SELECT DISTINCT viewer_id AS id
 from Views 
 group by viewer_id, view_date  --> 記得group by view_date
