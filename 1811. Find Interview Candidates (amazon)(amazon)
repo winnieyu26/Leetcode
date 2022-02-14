@@ -1,0 +1,116 @@
+ 
+1811. Find Interview Candidates
+64.5%
+中等
+Write an SQL query to report the name and the mail of all interview candidates. A user is an interview candidate if at least one of these two conditions is true:
+
+The user won any medal in three or more consecutive contests.
+The user won the gold medal in three or more different contests (not necessarily consecutive).
+Return the result table in any order.
+
+The query result format is in the following example.
+
+ 
+
+Example 1:
+
+Input: 
+Contests table:
++------------+------------+--------------+--------------+
+| contest_id | gold_medal | silver_medal | bronze_medal |
++------------+------------+--------------+--------------+
+| 190        | 1          | 5            | 2            |
+| 191        | 2          | 3            | 5            |
+| 192        | 5          | 2            | 3            |
+| 193        | 1          | 3            | 5            |
+| 194        | 4          | 5            | 2            |
+| 195        | 4          | 2            | 1            |
+| 196        | 1          | 5            | 2            |
++------------+------------+--------------+--------------+
+Users table:
++---------+--------------------+-------+
+| user_id | mail               | name  |
++---------+--------------------+-------+
+| 1       | sarah@leetcode.com | Sarah |
+| 2       | bob@leetcode.com   | Bob   |
+| 3       | alice@leetcode.com | Alice |
+| 4       | hercy@leetcode.com | Hercy |
+| 5       | quarz@leetcode.com | Quarz |
++---------+--------------------+-------+
+Output: 
++-------+--------------------+
+| name  | mail               |
++-------+--------------------+
+| Sarah | sarah@leetcode.com |
+| Bob   | bob@leetcode.com   |
+| Alice | alice@leetcode.com |
+| Quarz | quarz@leetcode.com |
++-------+--------------------+
+Explanation: 
+Sarah won 3 gold medals (190, 193, and 196), so we include her in the result table.
+Bob won a medal in 3 consecutive contests (190, 191, and 192), so we include him in the result table.
+    - Note that he also won a medal in 3 other consecutive contests (194, 195, and 196).
+Alice won a medal in 3 consecutive contests (191, 192, and 193), so we include her in the result table.
+Quarz won a medal in 5 consecutive contests (190, 191, 192, 193, and 194), so we include them in the result table.
+ 
+
+Follow up:
+
+What if the first condition changed to be "any medal in n or more consecutive contests"? How would you change your solution to get the interview candidates? Imagine that n is the parameter of a stored procedure.
+Some users may not participate in every contest but still perform well in the ones they do. How would you change your solution to only consider contests where the user was a participant? Suppose the registered users for each contest are given in another table.
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/find-interview-candidates
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+
+ 
+SELECT DISTINCT name, mail
+FROM(
+SELECT name, mail,
+contest_id - ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY contest_id) diff
+FROM Contests c, Users u
+WHERE u.user_id = c.gold_medal
+OR  u.user_id = c.silver_medal
+OR  u.user_id = c.bronze_medal
+) t
+GROUP BY name, mail, diff
+HAVING COUNT(*) >=3  # three or more consecutive
+ 
+UNION
+ 
+SELECT name, mail
+FROM Contests c, Users u
+WHERE u.user_id = c.gold_medal  #gold medal
+GROUP BY name, mail
+HAVING COUNT(*) >=3  #gold medal in three or more 
+
+
+
+WITH TT AS ( -- 构建一个看每人每年是否得奖的表格
+    SELECT Users.user_id AS user_id, 
+           Contests.contest_id AS contest_id, 
+           1 AS got_medal
+    FROM Users, Contests
+    WHERE gold_medal = Users.user_id
+     OR silver_medal = Users.user_id
+     OR bronze_medal = Users.user_id
+    ORDER BY Users.user_id, Contests.contest_id )
+
+SELECT name, mail
+FROM Users
+WHERE user_id IN (
+    -- 查询得过三次金奖的人
+    SELECT gold_medal
+    FROM Contests
+    GROUP BY gold_medal
+    HAVING COUNT(*) >= 3
+        UNION
+    -- 查询连续三年得奖的人
+    SELECT DISTINCT a.user_id
+    FROM TT a, TT b, TT c
+    WHERE a.user_id = b.user_id
+      AND b.user_id = c.user_id
+      AND a.contest_id + 1 = b.contest_id
+      AND b.contest_id + 1 = c.contest_id  )
+;
